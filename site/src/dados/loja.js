@@ -6,15 +6,14 @@ export const marca = {
   assinatura: 'Own the exceptional.',
   instagram: 'https://www.instagram.com/preemier.co/',
   whatsapp: 'https://wa.link/025bwy',
-  // abre a conversa (direct) com a Premier no Instagram
-  direct: 'https://ig.me/m/preemier.co',
 }
 
 export const menu = [
   { nome: 'Acervo', href: '#acervo' },
   // ainda não existe uma seção de marcas: leva ao acervo, onde estão as peças de cada uma
   { nome: 'Marcas', href: '#acervo' },
-  { nome: 'Desapegue', href: marca.direct, fora: true },
+  // quem quer vender a própria peça fala com a Premier pelo Instagram
+  { nome: 'Desapegue', href: marca.instagram, fora: true },
   { nome: 'Contato', href: marca.whatsapp, fora: true },
 ]
 
@@ -30,8 +29,6 @@ export const capa = {
   garantia:
     'Autenticidade: todos os produtos comercializados são autênticos e certificados. Enviamos para todo o Brasil, com atendimento pelo WhatsApp.',
   numero: { valor: '+1000', texto: 'peças autênticas entregues no Brasil' },
-  // canto superior esquerdo: para quem quer vender a própria peça (o "Desapegue" do Instagram)
-  desapegue: { rotulo: 'Desapegue', texto: 'Quer vender a sua peça?', link: 'Fale com a Premier no Instagram' },
 }
 
 // a última página: como comprar em três passos e o rodapé

@@ -80,7 +80,7 @@ export function Desfecho() {
             <a href={marca.whatsapp} target="_blank" rel="noreferrer">
               WhatsApp
             </a>
-            <a href={marca.direct} target="_blank" rel="noreferrer">
+            <a href={marca.instagram} target="_blank" rel="noreferrer">
               Desapegue
             </a>
           </nav>

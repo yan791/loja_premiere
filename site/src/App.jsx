@@ -386,13 +386,6 @@ export default function App() {
                 </span>
               ))}
             </p>
-            <a className="desapegue revela some-na-rolagem" href={marca.direct} target="_blank" rel="noreferrer">
-              <span className="desapegue-rotulo">{dados.desapegue.rotulo}</span>
-              <span className="desapegue-texto">{dados.desapegue.texto}</span>
-              <span className="desapegue-link">
-                {dados.desapegue.link} <span aria-hidden="true">↗</span>
-              </span>
-            </a>
             <p className="legenda legenda-lado some-na-rolagem">
               {dados.legendaLado.map((l) => (
                 <span className="linha-revela" key={l}>
