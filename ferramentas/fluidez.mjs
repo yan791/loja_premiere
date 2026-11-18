@@ -36,5 +36,16 @@ if (!movel) {
   }
 } else await esperar(2000)
 resumo(movel ? 'parado' : 'mouse', await page.evaluate(() => window.__q))
+// rolagem pela capa inteira, descendo e subindo de volta
+await page.evaluate(() => (window.__q = []))
+await page.mouse.move(movel ? 195 : 720, movel ? 420 : 450)
+for (const sentido of [1, -1]) {
+  for (let i = 0; i < 14; i++) {
+    await page.mouse.wheel({ deltaY: sentido * 120 })
+    await esperar(70)
+  }
+  await esperar(900)
+}
+resumo('rolagem', await page.evaluate(() => window.__q))
 console.log(erros.join('\n') || 'sem erros')
 await browser.close()

@@ -1,4 +1,4 @@
-/* Premier.co: papel creme, tinta quase preta, marrom do monograma. Serifa Didone no título, grotesca limpa no resto. */
+/* Premier.co: papel creme, tinta quase preta, marrom do monograma. Serifa Didone no nome, grotesca limpa no resto. */
 :root {
   --papel: #f1ece4;
   --papel-2: #e8e0d4;
@@ -16,7 +16,10 @@
   --texto: clamp(14px, 1.18vw, 19px);
   --legenda: clamp(12px, 1.12vw, 18px);
   --caixa-h: clamp(52px, 8.4vh, 76px);
-  --par-l: min(45vw, 66svh * 1.296);
+  /* composição da capa: onde fica o nome e onde fica o par (o par cobre o meio do nome) */
+  --nome-y: 52%;
+  --par-l: min(40vw, 60svh * 1.296);
+  --par-y: 44%;
   color-scheme: light;
 }
 
@@ -80,10 +83,50 @@ a {
   white-space: nowrap;
 }
 
-/* antes da fonte e do tênis carregarem, nada aparece (a entrada começa do zero, sem piscar) */
-.fase-carregando .topo,
-.fase-carregando .capa {
-  visibility: hidden;
+/* ---------- tela de carregamento (a da Liví, com a marca da Premier) ---------- */
+.cortina {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  background: var(--cafe);
+  color: var(--creme);
+  clip-path: inset(0% 0% 0% 0%);
+}
+
+.cortina-marca {
+  display: flex;
+  overflow: hidden;
+  padding-left: 0.42em;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 10vw, 7.5rem);
+  line-height: 1.1;
+  letter-spacing: 0.42em;
+}
+
+.cortina-marca span {
+  display: inline-block;
+}
+
+.cortina-sub {
+  margin: 14px 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1rem, 1.6vw, 1.3rem);
+  opacity: 0.85;
+}
+
+.cortina-linha {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 14%;
+  height: 1px;
+  background: rgba(227, 210, 182, 0.55);
+  transform-origin: left;
 }
 
 /* ---------- topo ---------- */
@@ -105,7 +148,7 @@ a {
   grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: clamp(20px, 3.6vw, 64px);
-  padding: 0 7px 0 clamp(10px, 1.3vw, 20px);
+  padding: 0 7px 0 clamp(8px, 0.9vw, 14px);
   border: 1px solid var(--linha);
   border-radius: var(--raio);
   font-size: var(--texto);
@@ -116,28 +159,42 @@ a {
 }
 
 .links {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.7vw, 12px);
+  gap: clamp(2px, 0.4vw, 8px);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.links li {
+  position: relative;
+  z-index: 1;
 }
 
 .links a {
   display: block;
   padding: 0.38em 0.85em;
   border-radius: 6px;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: color 0.35s ease;
 }
 
-.links a:hover {
-  background: var(--papel-2);
-}
-
-.links a.ativo {
-  background: var(--cafe);
+.links a.sob-pilula {
   color: var(--papel);
+}
+
+/* pílula marrom que escorrega até o link sob o mouse */
+.pilula-menu {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 1.95em;
+  margin-top: -0.975em;
+  border-radius: 6px;
+  background: var(--cafe);
+  z-index: 0;
 }
 
 .logo {
@@ -194,23 +251,33 @@ a {
 }
 
 /* ---------- capa ---------- */
+/* a capa é mais alta que a tela: enquanto se rola por ela, o palco fica parado e a câmera chega perto do par */
 .capa {
   position: relative;
+  height: 210svh;
+}
+
+.capa-palco {
+  position: sticky;
+  top: 0;
   height: 100svh;
   min-height: 600px;
   overflow: hidden;
+  /* luz de estúdio: um pouco mais clara atrás do par, caindo para as bordas */
+  background: radial-gradient(ellipse 62% 58% at 50% 46%, #f8f4ee 0%, #f1ece4 55%, #e9e2d7 100%);
 }
 
-.palco {
+.cena {
   position: absolute;
   inset: 0;
+  will-change: transform;
 }
 
 .palavra {
   position: absolute;
   left: 0;
   right: 0;
-  top: 47%;
+  top: var(--nome-y);
   display: flex;
   justify-content: center;
   transform: translateY(-50%);
@@ -218,23 +285,27 @@ a {
   user-select: none;
 }
 
-.palavra-tras {
+.palavra-sombra {
   z-index: 1;
 }
 
-.palavra-frente {
-  z-index: 4;
+.palavra-nome {
+  z-index: 2;
 }
 
 .letras {
   display: flex;
   font-family: var(--serif);
-  font-size: var(--palavra-fs, 17vw);
+  font-size: var(--nome-fs, 17vw);
   font-weight: 400;
   line-height: 0.8;
   letter-spacing: -0.012em;
   white-space: nowrap;
   will-change: transform;
+}
+
+.linha {
+  display: flex;
 }
 
 .letra {
@@ -248,31 +319,44 @@ a {
   display: inline-block;
 }
 
-.palavra-frente .letras {
+/* as letras: marrom quase preto com um degradê de luz de cima, como um volume no fundo da cena */
+.palavra-nome .letra > span {
+  background: linear-gradient(180deg, #54392c 0%, #3b2820 42%, #20150f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
-  -webkit-text-stroke: 1.2px rgba(23, 18, 15, 0.7);
+}
+
+/* a sombra que as letras fazem na parede: deixa o nome levemente descolado do fundo */
+.palavra-sombra .letra {
+  overflow: visible;
+}
+
+.palavra-sombra .letra > span {
+  color: transparent;
+  text-shadow: 0 0.05em 0.09em rgba(40, 24, 14, 0.2);
 }
 
 .par-posicao,
 .sombra-posicao {
   position: absolute;
   left: 50%;
-  top: 43%;
-  width: var(--par-l);
+  top: var(--par-y);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
 
 .par-posicao {
-  z-index: 3;
-  perspective: 1400px;
+  z-index: 4;
+  width: calc(var(--par-l) * 1.24);
+  perspective: 1600px;
 }
 
 .sombra-posicao {
-  z-index: 2;
+  z-index: 3;
   width: calc(var(--par-l) * 1.24);
-  top: calc(43% + var(--par-l) * 0.1);
-  margin-left: calc(var(--par-l) * 0.025);
+  top: calc(var(--par-y) + var(--par-l) * 0.11);
+  margin-left: calc(var(--par-l) * 0.03);
 }
 
 .par-movimento,
@@ -288,7 +372,7 @@ a {
 
 .sombra-parallax {
   will-change: transform, opacity;
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
 .par-parallax img,
@@ -301,10 +385,10 @@ a {
 }
 
 .sombra-parallax img {
-  transform: scaleY(0.9);
+  transform: scaleY(0.88);
 }
 
-/* reflexo que passa pelo tênis acompanhando o mouse (só onde existe tênis, pela máscara da própria foto) */
+/* reflexo que passa pelo tênis acompanhando o mouse e a rolagem (só onde existe tênis, pela máscara da própria foto) */
 .brilho {
   position: absolute;
   inset: 0;
@@ -330,7 +414,7 @@ a {
 /* ---------- textos da capa ---------- */
 .legenda {
   position: absolute;
-  z-index: 5;
+  z-index: 6;
   margin: 0;
   font-size: var(--legenda);
   line-height: 1.12;
@@ -348,20 +432,47 @@ a {
   display: inline-block;
 }
 
+/* logo acima do topo das letras (a altura das maiúsculas é 0,75 do tamanho da fonte) */
 .legenda-topo {
   left: 70.5%;
-  /* sempre logo acima do topo das letras (a altura das maiúsculas é 0,75 do tamanho da fonte) */
-  top: calc(47% - var(--palavra-fs, 300px) * 0.395 - 2.24 * var(--legenda) - 1.8vh);
+  top: calc(var(--nome-y) - var(--nome-fs-visto, 300px) * 0.395 - 2.24 * var(--legenda) - 2vh);
 }
 
 .legenda-lado {
   left: var(--margem);
-  top: 65.5%;
+  top: calc(var(--nome-y) + var(--nome-fs-visto, 300px) * 0.38 + 3vh);
+}
+
+.final {
+  position: absolute;
+  z-index: 6;
+  left: var(--margem);
+  bottom: calc(3vh + var(--caixa-h) + 3.4vh);
+  max-width: 36em;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity, translate;
+}
+
+.final-titulo {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(30px, 3.3vw, 58px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.final-texto {
+  margin: 0.7em 0 0;
+  font-size: var(--texto);
+  color: var(--cinza);
 }
 
 .garantia {
   position: absolute;
-  z-index: 5;
+  z-index: 6;
   left: 78.8%;
   right: var(--margem);
   bottom: calc(3vh + var(--caixa-h) * 1.5 + 2.4vh);
@@ -372,15 +483,11 @@ a {
   color: var(--cinza-2);
 }
 
-.garantia {
-  transition: opacity 0.5s ease;
+.garantia span {
+  display: block;
 }
 
-.capa:has(.ficha.aberta) .garantia {
-  opacity: 0;
-}
-
-.ficha {
+.numero {
   position: absolute;
   z-index: 6;
   left: 78.8%;
@@ -390,54 +497,25 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0.7em 0.9em 0.6em;
+  padding: 0.6em 0.9em 0.7em;
   border: 1px solid var(--linha);
   border-radius: var(--raio);
-  background: var(--papel);
   font-size: var(--texto);
   line-height: 1.22;
 }
 
-.ficha p {
-  margin: 0;
+.numero strong {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 2.1em;
+  line-height: 1;
 }
 
-.ficha-mais {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.ficha-mais > div {
-  overflow: hidden;
-  font-size: 0.82em;
+.numero span {
   color: var(--cinza);
 }
 
-.ficha-mais p {
-  padding-top: 0.5em;
-}
-
-.ficha.aberta .ficha-mais {
-  grid-template-rows: 1fr;
-}
-
-.ficha-botao {
-  align-self: flex-start;
-  margin-top: 0.8em;
-  padding-bottom: 2px;
-  background-image: linear-gradient(90deg, currentColor 1px, transparent 1px);
-  background-size: 3px 1px;
-  background-repeat: repeat-x;
-  background-position: 0 100%;
-  transition: color 0.3s ease;
-}
-
-.ficha-botao:hover {
-  color: var(--cafe);
-}
-
-.compra {
+.acoes {
   position: absolute;
   z-index: 6;
   left: var(--margem);
@@ -445,107 +523,92 @@ a {
   display: flex;
   gap: clamp(8px, 1.1vw, 16px);
   height: var(--caixa-h);
-  font-size: calc(var(--texto) * 0.92);
+  font-size: calc(var(--texto) * 0.95);
 }
 
-.caixa {
-  position: relative;
+.acao {
   display: flex;
   align-items: center;
-  gap: 1.3em;
-  padding: 0 0.7em 0 1.05em;
-  border: 1px solid var(--linha);
-  border-radius: var(--raio);
-  font-weight: 560;
-  white-space: nowrap;
-}
-
-.pilula {
-  display: grid;
-  place-items: center;
-  min-width: 2.9em;
-  height: 1.95em;
-  padding: 0 0.75em;
-  border-radius: 5px;
-  background: var(--cafe);
-  color: var(--papel);
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  transition: background-color 0.35s ease;
-}
-
-button.pilula:hover {
-  background: var(--tinta);
-}
-
-.tamanhos {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  right: 0.7em;
-  display: flex;
-  gap: 4px;
-  margin: 0;
-  padding: 5px;
-  list-style: none;
-  border: 1px solid var(--linha);
-  border-radius: var(--raio);
-  background: var(--papel);
-  animation: abrir-tamanhos 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.tamanhos button {
-  min-width: 2.9em;
-  height: 2.1em;
-  border-radius: 5px;
-  font-variant-numeric: tabular-nums;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.tamanhos button:hover {
-  background: var(--papel-2);
-}
-
-.tamanhos button[aria-selected='true'] {
-  background: var(--cafe);
-  color: var(--papel);
-}
-
-@keyframes abrir-tamanhos {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
-
-.adicionar {
-  min-width: 10.5em;
+  gap: 0.8em;
   padding: 0 1.6em;
   border-radius: var(--raio);
-  background: var(--tinta);
-  color: var(--papel);
   font-weight: 600;
-  transition: background-color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  transition: background-color 0.4s ease, color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.adicionar:hover {
-  background: var(--cafe);
-}
-
-.adicionar:active {
+.acao:active {
   transform: scale(0.97);
 }
 
-.adicionar.feito {
+.acao-principal {
+  background: var(--tinta);
+  color: var(--papel);
+}
+
+.acao-principal span {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.acao-principal:hover {
   background: var(--cafe);
 }
 
-/* miniatura que voa até a sacola */
-.voo {
-  position: fixed;
-  z-index: 40;
+.acao-principal:hover span {
+  transform: translate(3px, -3px);
+}
+
+.acao-contorno {
+  border: 1px solid var(--linha);
+}
+
+.acao-contorno:hover {
+  background: var(--papel-2);
+}
+
+/* convite para rolar: uma linha fina que desce sem parar */
+.dica {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: 3.4vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cinza);
   pointer-events: none;
-  object-fit: contain;
-  will-change: transform, opacity;
+}
+
+.dica i {
+  position: relative;
+  width: 1px;
+  height: 38px;
+  overflow: hidden;
+  background: rgba(23, 18, 15, 0.14);
+}
+
+.dica i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--tinta);
+  transform-origin: top;
+  animation: descer 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes descer {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 /* ---------- sacola ---------- */
@@ -710,14 +773,29 @@ button.pilula:hover {
   color: var(--cinza);
 }
 
+/* telas baixas de notebook: tudo um pouco mais compacto embaixo */
+@media (min-width: 761px) and (max-height: 700px) {
+  :root {
+    --caixa-h: 50px;
+  }
+
+  .garantia {
+    display: none;
+  }
+}
+
 /* ---------- celular ---------- */
 @media (max-width: 760px) {
   :root {
     --topo-h: 52px;
     --texto: 15px;
     --legenda: 12px;
-    --caixa-h: 54px;
-    --par-l: min(104vw, 46svh * 1.296);
+    --caixa-h: 52px;
+    --nome-y: 47%;
+    --par-l: min(90vw, 40svh * 1.296);
+    --par-y: 46%;
+    /* espaço entre PRE e MIER: o par fica no meio e cobre só a base de uma linha e o topo da outra */
+    --nome-gap: calc(var(--par-l) / 1.296 * 0.72);
   }
 
   .topo {
@@ -728,7 +806,6 @@ button.pilula:hover {
     grid-template-columns: auto 1fr auto;
     gap: 10px;
     padding-left: 6px;
-    background: rgba(241, 236, 228, 0.94);
   }
 
   .menu-botao {
@@ -738,6 +815,10 @@ button.pilula:hover {
     border-radius: 6px;
     background: var(--cafe);
     color: var(--papel);
+  }
+
+  .pilula-menu {
+    display: none;
   }
 
   .links {
@@ -782,85 +863,66 @@ button.pilula:hover {
   }
 
   .capa {
-    height: auto;
-    min-height: 100svh;
-    display: flex;
+    height: 175svh;
+  }
+
+  .capa-palco {
+    min-height: 560px;
+  }
+
+  /* no celular o nome vira duas linhas grandes e o par fica no encontro delas */
+  .letras {
     flex-direction: column;
-    padding: calc(var(--topo-h) + 10px) var(--margem) 16px;
-    overflow: hidden;
-  }
-
-  .palco {
-    position: relative;
-    inset: auto;
-    order: 1;
-    height: 46svh;
-    min-height: 300px;
-    margin: 0 calc(-1 * var(--margem));
-  }
-
-  .palavra {
-    top: 50%;
-  }
-
-  .par-posicao {
-    top: 47%;
-  }
-
-  .sombra-posicao {
-    top: calc(47% + var(--par-l) * 0.1);
-  }
-
-  .legenda {
-    position: static;
+    align-items: center;
+    gap: var(--nome-gap);
+    line-height: 0.84;
   }
 
   .legenda-topo {
-    order: 0;
-    align-self: flex-end;
-    margin-top: 14px;
+    left: auto;
+    right: var(--margem);
+    top: calc(var(--topo-h) + 24px);
     text-align: right;
   }
 
   .legenda-lado {
-    order: 2;
-    margin-top: 4px;
+    top: calc(var(--nome-y) + var(--nome-fs-visto, 120px) * 0.84 + var(--nome-gap) / 2 + 16px);
   }
 
-  .garantia {
-    position: static;
-    order: 3;
-    margin-top: 14px;
-    font-size: 11.5px;
+  .garantia,
+  .numero {
+    display: none;
   }
 
-  .ficha {
-    position: static;
-    order: 4;
-    min-height: 0;
-    margin-top: 14px;
-    flex-direction: column;
+  .final {
+    right: var(--margem);
+    bottom: calc(16px + var(--caixa-h) + 18px);
   }
 
-  .compra {
-    position: static;
-    order: 5;
-    height: auto;
-    margin-top: 10px;
+  .final-titulo {
+    font-size: 34px;
+  }
+
+  .final-texto {
+    font-size: 14px;
+  }
+
+  .acoes {
+    left: var(--margem);
+    right: var(--margem);
+    bottom: 16px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     font-size: 14px;
   }
 
-  .caixa {
-    height: var(--caixa-h);
-    justify-content: space-between;
-    gap: 0.6em;
+  .acao {
+    justify-content: center;
+    padding: 0 0.8em;
   }
 
-  .adicionar {
-    grid-column: 1 / -1;
-    height: var(--caixa-h);
+  .dica {
+    bottom: calc(16px + var(--caixa-h) + 16px);
   }
 
   .sacola-painel {
@@ -874,20 +936,21 @@ button.pilula:hover {
   }
 }
 
-@media (max-width: 760px) and (max-height: 700px) {
-  .garantia {
+/* celular baixo: sem a legenda de cima, para o PRE ter espaço embaixo do menu */
+@media (max-width: 760px) and (max-height: 760px) {
+  .legenda-topo {
     display: none;
   }
 }
 
-/* telas baixas de notebook: tudo um pouco mais compacto embaixo */
-@media (min-width: 761px) and (max-height: 700px) {
-  :root {
-    --caixa-h: 50px;
-    --par-l: min(42vw, 62svh * 1.296);
+/* celular bem baixo: só o essencial embaixo, para nada encostar no MIER */
+@media (max-width: 760px) and (max-height: 700px) {
+  .legenda-lado,
+  .final-texto {
+    display: none;
   }
 
-  .garantia {
-    display: none;
+  .final-titulo {
+    font-size: 28px;
   }
 }

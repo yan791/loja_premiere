@@ -11,7 +11,7 @@ const { browser, page, erros } = await abrir({ largura: 1440, altura: 900 })
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForSelector('.fase-entrada', { timeout: 20000 })
 let antes = 0
-for (const ms of [250, 700, 1200, 1900]) {
+for (const ms of [450, 900, 1400, 2100]) {
   await esperar(ms - antes)
   antes = ms
   await page.screenshot({ path: `${pasta}entrada-${ms}.png` })
