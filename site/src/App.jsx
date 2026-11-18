@@ -16,6 +16,8 @@ const lerSacola = () => {
 const movel = () => window.matchMedia('(max-width: 760px)').matches
 const toque = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
 const base = import.meta.env.BASE_URL
+// a máscara do brilho vai por variável CSS, que resolve endereço relativo a partir do arquivo de estilo (assets/);
+// por isso o endereço dela é sempre completo
 
 function Palavra({ texto, camada }) {
   // duas cópias da palavra no mesmo lugar: a de trás é cheia, a da frente é só o contorno,
@@ -271,7 +273,7 @@ export default function App() {
                   draggable="false"
                 />
               </picture>
-              <div className="brilho" aria-hidden="true" style={{ '--mascara': `url(${base}tenis/${produto.n}${movel() ? '-m' : ''}.webp)` }}>
+              <div className="brilho" aria-hidden="true" style={{ '--mascara': `url(${new URL(`${base}tenis/${produto.n}${movel() ? '-m' : ''}.webp`, location.href).href})` }}>
                 <i />
               </div>
             </div>
