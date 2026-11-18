@@ -12,8 +12,9 @@ export const marca = {
 
 export const menu = [
   { nome: 'Acervo', href: '#acervo' },
-  { nome: 'Marcas', href: '#marcas' },
-  { nome: 'Curadoria', href: '#curadoria' },
+  // ainda não existe uma seção de marcas: leva ao acervo, onde estão as peças de cada uma
+  { nome: 'Marcas', href: '#acervo' },
+  { nome: 'Desapegue', href: marca.direct, fora: true },
   { nome: 'Contato', href: marca.whatsapp, fora: true },
 ]
 
