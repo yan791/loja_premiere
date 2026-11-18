@@ -6,6 +6,7 @@ import { Monograma } from './componentes/Monograma.jsx'
 import { Sacola } from './componentes/Sacola.jsx'
 import { Cortina } from './componentes/Cortina.jsx'
 import { Acervo } from './componentes/Acervo.jsx'
+import { Desfecho } from './componentes/Desfecho.jsx'
 
 const movel = () => window.matchMedia('(max-width: 760px)').matches
 const toque = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
@@ -270,6 +271,7 @@ export default function App() {
       camadas.cedo.forEach((n) => {
         escrever(n, 'opacity', cedo)
         escrever(n, 'translate', `0 ${((1 - cedo) * -18).toFixed(1)}px`)
+        escrever(n, 'pointerEvents', cedo < 0.05 ? 'none' : '')
       })
       const tarde = suave(0.55, 0.92, p).toFixed(3)
       camadas.tarde.forEach((n) => {
@@ -384,6 +386,13 @@ export default function App() {
                 </span>
               ))}
             </p>
+            <a className="desapegue revela some-na-rolagem" href={marca.direct} target="_blank" rel="noreferrer">
+              <span className="desapegue-rotulo">{dados.desapegue.rotulo}</span>
+              <span className="desapegue-texto">{dados.desapegue.texto}</span>
+              <span className="desapegue-link">
+                {dados.desapegue.link} <span aria-hidden="true">↗</span>
+              </span>
+            </a>
             <p className="legenda legenda-lado some-na-rolagem">
               {dados.legendaLado.map((l) => (
                 <span className="linha-revela" key={l}>
@@ -424,6 +433,7 @@ export default function App() {
         </section>
 
         <Acervo />
+        <Desfecho />
       </main>
 
       {/* o par que voa da capa até o cartão de destaque do acervo */}

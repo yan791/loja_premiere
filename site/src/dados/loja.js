@@ -6,6 +6,8 @@ export const marca = {
   assinatura: 'Own the exceptional.',
   instagram: 'https://www.instagram.com/preemier.co/',
   whatsapp: 'https://wa.link/025bwy',
+  // abre a conversa (direct) com a Premier no Instagram
+  direct: 'https://ig.me/m/preemier.co',
 }
 
 export const menu = [
@@ -27,6 +29,20 @@ export const capa = {
   garantia:
     'Autenticidade: todos os produtos comercializados são autênticos e certificados. Enviamos para todo o Brasil, com atendimento pelo WhatsApp.',
   numero: { valor: '+1000', texto: 'peças autênticas entregues no Brasil' },
+  // canto superior esquerdo: para quem quer vender a própria peça (o "Desapegue" do Instagram)
+  desapegue: { rotulo: 'Desapegue', texto: 'Quer vender a sua peça?', link: 'Fale com a Premier no Instagram' },
+}
+
+// a última página: como comprar em três passos e o rodapé
+export const desfecho = {
+  rotulo: 'Como comprar',
+  titulo: 'Do acervo até você.',
+  passos: [
+    { titulo: 'Escolha a peça', texto: 'Veja o acervo e separe a sua.' },
+    { titulo: 'Fale com a Premier', texto: 'Pelo WhatsApp, a Premier confirma tamanho e condição e envia mais fotos da peça.' },
+    { titulo: 'Receba em casa', texto: 'Envio para todo o Brasil.' },
+  ],
+  chamada: 'Falar no WhatsApp',
 }
 
 export const reais = (v) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 0 })
