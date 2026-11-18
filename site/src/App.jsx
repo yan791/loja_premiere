@@ -5,6 +5,7 @@ import { marca, menu, capa as dados } from './dados/loja.js'
 import { Monograma } from './componentes/Monograma.jsx'
 import { Sacola } from './componentes/Sacola.jsx'
 import { Cortina } from './componentes/Cortina.jsx'
+import { Acervo } from './componentes/Acervo.jsx'
 
 const movel = () => window.matchMedia('(max-width: 760px)').matches
 const toque = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
@@ -17,6 +18,7 @@ const urlTenis = (sufixo = '') => new URL(`${base}tenis/${dados.tenis.n}${sufixo
 // assim nada fica borrado quando a câmera chega perto
 const ZOOM_PAR = 1.24
 const ZOOM_NOME = 1.08
+const ASPECTO = 1183 / 913 // largura / altura do recorte do par
 
 const limitar = (x) => Math.min(1, Math.max(0, x))
 const suave = (a, b, x) => {
@@ -101,6 +103,15 @@ export default function App() {
 
   const entrar = useCallback(() => setFase('entrada'), [])
 
+  // links internos (#acervo) rolam suave até a seção
+  const irPara = (ev) => {
+    const href = ev.currentTarget.getAttribute('href')
+    if (!href?.startsWith('#') || !lenis.current) return
+    ev.preventDefault()
+    setMenuAberto(false)
+    lenis.current.scrollTo(href === '#inicio' ? 0 : href, { offset: -10, duration: 2.2 })
+  }
+
   // entrada da capa, junto com a cortina subindo: o nome nasce do centro para fora, o par desce e assenta na frente
   useLayoutEffect(() => {
     if (fase !== 'entrada') return
@@ -149,6 +160,13 @@ export default function App() {
       cedo: [...el.querySelectorAll('.some-na-rolagem')],
       tarde: [...el.querySelectorAll('.surge-na-rolagem')],
       dica: q('.dica'),
+    }
+    const voo$ = {
+      posicao: q('.par-posicao'),
+      acervo: document.querySelector('#acervo'),
+      alvo: document.querySelector('.destaque-alvo'),
+      alvoSombra: document.querySelector('.peca-destaque .peca-sombra'),
+      img: document.querySelector('.voador'),
     }
     let alvoX = 0
     let alvoY = 0
@@ -201,12 +219,43 @@ export default function App() {
 
       // par: plano da frente; com a rolagem chega perto (cresce), sobe e gira um pouco
       const sPar = (1 + (ZOOM_PAR - 1) * e) / ZOOM_PAR
+      const parX = x * 22 + e * W * 0.015
+      const parY = y * 12 + boia * 9 - e * H * 0.045
+      const parGiro = Math.sin(t * 0.8) * 0.7 - e * 5
       escrever(
         camadas.par,
         'transform',
-        `translate3d(${(x * 22 + e * W * 0.015).toFixed(2)}px, ${(y * 12 + boia * 9 - e * H * 0.045).toFixed(2)}px, 0) ` +
-          `rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg) rotateZ(${(Math.sin(t * 0.8) * 0.7 - e * 5).toFixed(2)}deg) scale(${sPar.toFixed(4)})`,
+        `translate3d(${parX.toFixed(2)}px, ${parY.toFixed(2)}px, 0) ` +
+          `rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg) rotateZ(${parGiro.toFixed(2)}deg) scale(${sPar.toFixed(4)})`,
       )
+
+      // voo: quando o acervo entra na tela, o par sai da capa e pousa no cartão de destaque
+      let voo = 0
+      const alvo = voo$.alvo
+      if (alvo && alvo.offsetParent && voo$.acervo) {
+        voo = limitar((H - voo$.acervo.getBoundingClientRect().top) / (H * 0.85))
+        const pr = voo$.posicao.getBoundingClientRect()
+        const lA = pr.width * sPar
+        const cA = [pr.left + pr.width / 2 + parX, pr.top + pr.height / 2 + parY]
+        const rb = alvo.getBoundingClientRect()
+        const lB = rb.width
+        const cB = [rb.left + rb.width / 2, rb.top + rb.height / 2]
+        const k = suave(0, 1, voo)
+        const lV = lA + (lB - lA) * k
+        const cx = cA[0] + (cB[0] - cA[0]) * k
+        // o caminho faz uma curvinha para baixo, como se o par caísse no cartão
+        const cy = cA[1] + (cB[1] - cA[1]) * k + Math.sin(k * Math.PI) * H * 0.06
+        const giro = parGiro * (1 - k) + Math.sin(k * Math.PI) * 6
+        const voando = voo > 0 && voo < 1
+        escrever(voo$.img, 'visibility', voando ? 'visible' : 'hidden')
+        if (voando) escrever(voo$.img, 'transform', `translate3d(${(cx - 500).toFixed(1)}px, ${(cy - 500 / ASPECTO).toFixed(1)}px, 0) rotate(${giro.toFixed(2)}deg) scale(${(lV / 1000).toFixed(4)})`)
+        escrever(camadas.par, 'opacity', voo > 0 ? '0' : '1')
+        escrever(alvo, 'opacity', voo >= 1 ? '1' : '0')
+        if (voo$.alvoSombra) escrever(voo$.alvoSombra, 'opacity', (0.5 * suave(0.75, 1, voo)).toFixed(3))
+      } else {
+        escrever(camadas.par, 'opacity', '1')
+        if (voo$.img) escrever(voo$.img, 'visibility', 'hidden')
+      }
 
       // sombra do par na parede: quanto mais perto da câmera, mais longe da parede, mais larga e mais fraca
       escrever(
@@ -214,7 +263,7 @@ export default function App() {
         'transform',
         `translate3d(${(x * 8 - x * 6 * e).toFixed(2)}px, ${(y * 4 + e * H * 0.03).toFixed(2)}px, 0) scale(${(1 - boia * 0.035 + e * 0.22).toFixed(4)})`,
       )
-      escrever(camadas.sombra, 'opacity', (0.42 - boia * 0.05 - e * 0.16).toFixed(3))
+      escrever(camadas.sombra, 'opacity', ((0.42 - boia * 0.05 - e * 0.16) * (1 - suave(0, 0.3, voo))).toFixed(3))
       escrever(camadas.brilho, 'transform', `translate3d(${(x * 38 - 10 + Math.sin(t * 0.5) * 12 + e * 90).toFixed(2)}%, 0, 0) rotate(14deg)`)
 
       const cedo = (1 - suave(0.05, 0.4, p)).toFixed(3)
@@ -272,14 +321,14 @@ export default function App() {
                   onMouseEnter={(e) => moverPilula(e.currentTarget)}
                   onFocus={(e) => moverPilula(e.currentTarget)}
                   {...(m.fora ? { target: '_blank', rel: 'noreferrer' } : {})}
-                  onClick={() => setMenuAberto(false)}
+                  onClick={m.fora ? () => setMenuAberto(false) : irPara}
                 >
                   {m.nome}
                 </a>
               </li>
             ))}
           </ul>
-          <a className="logo surge" href="#inicio" aria-label="Premier.co, início">
+          <a className="logo surge" href="#inicio" aria-label="Premier.co, início" onClick={irPara}>
             <Monograma className="logo-monograma" />
             <span className="logo-nome">
               PREMIER<span>.CO</span>
@@ -358,7 +407,7 @@ export default function App() {
             </div>
 
             <div className="acoes">
-              <a className="acao acao-principal revela" href={marca.instagram} target="_blank" rel="noreferrer">
+              <a className="acao acao-principal revela" href="#acervo" onClick={irPara}>
                 Ver o acervo
                 <span aria-hidden="true">↗</span>
               </a>
@@ -373,7 +422,12 @@ export default function App() {
             </div>
           </div>
         </section>
+
+        <Acervo />
       </main>
+
+      {/* o par que voa da capa até o cartão de destaque do acervo */}
+      <img className="voador" src={`${base}tenis/${dados.tenis.n}.webp`} alt="" aria-hidden="true" draggable="false" />
 
       <Sacola aberta={aberta} fechar={() => setAberta(false)} itens={[]} remover={() => {}} base={base} />
     </div>

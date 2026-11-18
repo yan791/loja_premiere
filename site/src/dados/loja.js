@@ -9,7 +9,7 @@ export const marca = {
 }
 
 export const menu = [
-  { nome: 'Acervo', href: marca.instagram, fora: true },
+  { nome: 'Acervo', href: '#acervo' },
   { nome: 'Marcas', href: '#marcas' },
   { nome: 'Curadoria', href: '#curadoria' },
   { nome: 'Contato', href: marca.whatsapp, fora: true },

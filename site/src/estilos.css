@@ -151,6 +151,8 @@ a {
   padding: 0 7px 0 clamp(8px, 0.9vw, 14px);
   border: 1px solid var(--linha);
   border-radius: var(--raio);
+  /* fundo de papel: quando o acervo passa por baixo, o menu continua legível */
+  background: rgba(241, 236, 228, 0.92);
   font-size: var(--texto);
 }
 

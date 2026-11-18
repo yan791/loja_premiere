@@ -40,7 +40,7 @@ resumo(movel ? 'parado' : 'mouse', await page.evaluate(() => window.__q))
 await page.evaluate(() => (window.__q = []))
 await page.mouse.move(movel ? 195 : 720, movel ? 420 : 450)
 for (const sentido of [1, -1]) {
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 34; i++) {
     await page.mouse.wheel({ deltaY: sentido * 120 })
     await esperar(70)
   }
